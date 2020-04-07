@@ -1,4 +1,4 @@
- 0000           ; MCS PRAKTIKUM 1 AUFG 2 Ochsendorf Marcel 3120232
+ 0000           ; MCS 2020 LED Teil 2
  0000           
  0000           
                 .AREA   Memory (abs)
@@ -49,31 +49,32 @@
  4013 064016    MAIN:                   JMP CHECK_BTN
  4016           
  4016 F60001    CHECK_BTN:              LDAB PORTB               ; LESE PORT B EIN
- 4019 C401                                      ANDB    #0b00000001 ;MASKE AUFS ERSTE BIT
- 401B 26F6                                      BNE     MAIN ;WENN GESETZT WIEDER AUF MAIN ZURUECK
- 401D           
- 401D E6EA1000  DISPLAY:                LDAB LED_PHASEN,Y                                       ;HOLE BITMUSTER DER PHASE MIT OFFSET
- 4021 7B0248                                    STB PORTS                                                       ;WRITE OUTPUT AND WAIT
- 4024 070C                                      BSR WDELAY                                                      ;WAIT DELAY
- 4026                                   ;       JMP MAIN        
- 4026                                                           
- 4026 03                                        DEY
- 4027 2703                                      BEQ RESET_COUNTER                                       ; WENN Y NICHT NEGATIV IST 0-3 -> DISPLAY
- 4029 064013                                    JMP MAIN
- 402C                                                                                                                   
- 402C           
- 402C                                           
- 402C CD0004    RESET_COUNTER:  LDY     #ANZAHL_PHASEN
- 402F 064013                                    JMP MAIN
- 4032                                           
- 4032                           
- 4032 CE01F4    WDELAY: LDX     #DELAY                  ; SPEICHERE DELAY WERT IN X
- 4035 16F809    WLOOP:  JSR     Warte1ms                ; CALL Warte1ms
- 4038 0435FA            DBNE    X,WLOOP                 ; WENN X != 0 GEHE ZU WLOOP
- 403B 3D                RTS                                             ; RETURN
- 403C                    
- 403C            
- 403C           ; **********************************************************************************
- 403C           
+ 4019 51                                        COMB                     ;INVERTIERE B
+ 401A C401                                      ANDB    #0b00000001 ;MASKE AUFS ERSTE BIT
+ 401C 26F5                                      BNE     MAIN ;WENN GESETZT WIEDER AUF MAIN ZURUECK
+ 401E           
+ 401E E6EA1000  DISPLAY:                LDAB LED_PHASEN,Y                                       ;HOLE BITMUSTER DER PHASE MIT OFFSET
+ 4022 7B0248                                    STB PORTS                                                       ;WRITE OUTPUT AND WAIT
+ 4025 070C                                      BSR WDELAY                                                      ;WAIT DELAY
+ 4027                                   ;       JMP MAIN        
+ 4027                                                           
+ 4027 03                                        DEY
+ 4028 2703                                      BEQ RESET_COUNTER                                       ; WENN Y NICHT NEGATIV IST 0-3 -> DISPLAY
+ 402A 064013                                    JMP MAIN
+ 402D                                                                                                                   
+ 402D           
+ 402D                                           
+ 402D CD0004    RESET_COUNTER:  LDY     #ANZAHL_PHASEN
+ 4030 064013                                    JMP MAIN
+ 4033                                           
+ 4033                           
+ 4033 CE01F4    WDELAY: LDX     #DELAY                  ; SPEICHERE DELAY WERT IN X
+ 4036 16F809    WLOOP:  JSR     Warte1ms                ; CALL Warte1ms
+ 4039 0435FA            DBNE    X,WLOOP                 ; WENN X != 0 GEHE ZU WLOOP
+ 403C 3D                RTS                                             ; RETURN
+ 403D                    
+ 403D            
+ 403D           ; **********************************************************************************
+ 403D           
                         .ORG    $FFFE
  FFFE 4000              .DW     START           ; RESTART Vektor
