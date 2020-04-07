@@ -1,6 +1,3 @@
-; MCS PRAKTIKUM 1 AUFG 1 Ochsendorf Marcel 3120232
-
-
 .AREA	Memory (abs)
 STACK	=	$1000		; Nach RESET $1000, nach SetUp $2000=(End of RAM)+1
 SetUp	=	$F800		; Suboutine System SetUp
