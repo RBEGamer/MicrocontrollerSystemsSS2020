@@ -1,0 +1,130 @@
+WARNING: EXTCODE CODE AREA DO NOT CONTAIN RELOCATED ADDRESSES.
+THIS WILL BE REMEDIED IN A LATER RELEASE.
+--- 0000           ; MCS 2020 ADU OCHSENDORF MARCEL
+--- 0000           
+--- 0000           
+                .AREA   Memory (abs)
+ 1000           STACK	=	$1000		  					 ; Nach RESET $1000, nach SetUp $2000=(End of RAM)+1
+ F800           SetUp	=	$F800		  	   		 		 ; Suboutine System SetUp
+ F809           Warte1ms=	SetUp+9
+ F806           VoltAnz =	SetUp+6
+ F803           LCD4x20A= 	SetUp+3
+--- 0000           
+ 0000           PORTA	=	0x0000
+ 0001           PORTB   =   0x0001
+ 0002           DDRA    =   0x0002
+ 0001           BIT0    =   0b00000001
+ 0008           BIT3    =   0b00001000
+ 0010           BIT4    =   0b00010000
+ 0080           SPIF    =   0b10000000
+ 00D8           SPICR   =   0x00D8
+ 00DD           SPIDR   =   0x00DD
+ 00DB           SPISR   =   0x00DB
+ 00DA           SPIBR   =   0x00DA
+--- 0000           
+--- 0000           
+                        .ORG    $1000                                                      ; Variablen ab 0x1000
+                        
+                ; RAM
+ 1000            DACVAL: .BLKB 1                                                            ;STORES THE DAC VALUE
+ 1001            SCANBIT: .BLKB 1                                                           ;STORES THE SCANBIT
+ 1002            DACVAL_WATCH: .BLKB 1                                              ;DACVAL TMP WIRD IN JEDEM LOOP GEPEICHER FÜR DEBUGGING
+                        .ORG    $4000                                                      ; Program Code ab 0x4000
+                        
+                ; FLASH 
+                
+                
+                
+ 4000  CF1000    START:  LDS     #STACK                                                     ; Setzen Stackpointer
+ 4003  16F800                    JSR     SetUp                                                      ; System SetUp
+ 4006            
+ 4006                            
+ 4006  164026    INIT:   JSR SPI_INIT                                               ; INIT SPI
+ 4009  164015                    JSR CLEAR_DISP                                             ; CLEAR DISPLAY
+ 400C                              
+ 400C            
+ 400C                    
+ 400C                    
+ 400C            MAIN:
+ 400C  164039                                    JSR APPROX                                         ; START APPROX
+ 400F  16401C                                    JSR DISPLAY_DAC                            ; WERT AUF DEM DISPLAY ANZEIGEN
+ 4012  06400C                                    JMP MAIN
+ 4015            
+ 4015            
+ 4015                            
+ 4015            CLEAR_DISP: 
+ 4015  CEFFFF                            LDX #0xFFFF                                        ; CLEAR DISPLAY
+ 4018  16F803                            JSR LCD4x20A                                       ; SHOW DISPLAY          
+ 401B  3D                                RTS
+ 401C             
+ 401C            DISPLAY_DAC:
+ 401C  B61000                            LDAA DACVAL                                                ; LADE DAC VALUE IN ACCU_A
+ 401F  CD0208                            LDY #0x0208                                                ; CURSOR POSITION ZEILE 2 POS 8
+ 4022  16F806                            JSR VoltAnz
+ 4025  3D                                RTS
+ 4026                                    
+ 4026            SPI_INIT:	   		   						   ; INIT SPI
+ 4026  1C000208                   BSET DDRA, #BIT3                                          ; SETZTE PA3 AUF OUTPUT = SPI SPI_CS SIGNAL
+ 402A  180B5400D8                 MOVB #0b01010100, SPICR                           ; SETUP SPI CONTROL
+ 402F  180B0000DA                 MOVB #0, SPIBR                                            ; SETZTE SPIBR auf 0x00
+ 4034  1C000008                   BSET PORTA, #BIT3                                         ; SETZTE SPI_CS AUF HIGH
+ 4038  3D                         RTS                    
+ 4039            
+ 4039                             
+ 4039            ;--------- IN DER APPROX_LOOP DAS SCANBIT IMMER EINEN WEITER NACH RECHTS SCHIEBEN
+ 4039            ;--------- DANN DATEN AUF DEN DAC SCHIEBEN UND ERGEBNIS AUF PB0 PRÜFEN
+ 4039            ;--------- WENN PB0 LOW -> DAC_VOLTAGE > REF_VOLTAGE -> NEUE INTERATION -> SO DAC_VAL KLEINER WERDEN LASSEN
+ 4039            
+ 4039            APPROX:
+ 4039  180B001000                 MOVB #0, DACVAL                                           ; DACVAL AUF 0 SETZTEN
+ 403E  180B801001                 MOVB #0b10000000, SCANBIT                         ; SCANBIT ANFANGSPOSITION
+ 4043            APPROX_LOOP:
+ 4043  B61000                            LDAA DACVAL                                                ; LADE DACVAL IN AKKU_A
+ 4046  BA1001                            ORAA SCANBIT                                       ; ODER ACC_A mit dem SCANBIT
+ 4049  16406C                            JSR SPI_SEND                                       ; SENDE DEN WERT AN DEN DAC
+ 404C  16F809                            JSR Warte1ms                                       ; WARTE 1ms
+ 404F  1F00010109                        BRCLR PORTB, #BIT0, NEXT_SCAN      ; WENN PB0 LOW DAC_VOLTAGE > REF_VOLTAGE -> NÄCHSTE ITERATION
+ 4054                                                                                                       ; SONST SPEICHERE DEN SCAN -> SAVE_SCAN
+ 4054                                    
+ 4054            SAVE_SCAN:
+ 4054  B61000                      LDAA DACVAL                                              ; LADE DACVAL IN ACCU_A
+ 4057  BA1001                      ORAA SCANBIT                                             ; ODER MIT DEM AKTUELLEN SCANBIT -> NEUE DACVAL WERT
+ 405A  7A1000                      STAA DACVAL                                              ; SPEICHERE AKKU_A IN DACVAL
+ 405D                              
+ 405D            NEXT_SCAN:
+ 405D  741001                      LSR SCANBIT                                              ; SCHIEBE SCAN BIT EINS NACH RECHTS
+ 4060  26E1                        BNE APPROX_LOOP                                          ; SCANBIT IST NICHT NULL -> ZIEL NOCH NICHT ERREICHT -> APPROX_LOOP
+ 4062  B61000                      LDAA DACVAL                                              ; LADE DAC_VAL IN ACCU_A
+ 4065  16406C                      JSR SPI_SEND                                             ; SENDE DAC_VAL TO DAC
+ 4068  16F809                      JSR Warte1ms                                             ; WARTE 1ms
+ 406B  3D                          RTS           
+ 406C                      
+ 406C                                                                                            
+ 406C            
+ 406C                             
+ 406C            SPI_SEND:
+ 406C  7A1002                      STAA DACVAL_WATCH                                                        ;FÜR DEBUGGING = WERT DER AN DEN DAC GESCHCIKT WIRD                                                          ; IN AKKU A STEHT_DACVAL
+ 406F  C600                        LDAB #0                                                                          ; D = 0
+ 4071  49                          LSRD                                                                             ; = SCHIEBE A UM 4 STELLEN NACH RECHTS UM AN DIE PASSENDE POSITION ZU GELANGEN
+ 4072  49                          LSRD
+ 4073  49                          LSRD
+ 4074  49                          LSRD
+ 4075  1D000008                    BCLR PORTA, #BIT3                                                ; SPI_CS AUF LOW SETZTEN -> ADU AKTIVIEREN
+ 4079  7A00DD                      STAA SPIDR                                                               ; DATEN AUS ACCU_A IN SPI BUFFER SCHREIBEN
+ 407C            
+ 407C            SPI_LOOP_SPISR_CLEAR_1:	
+ 407C  1F00DB80FB                  BRCLR SPISR, #SPIF, SPI_LOOP_SPISR_CLEAR_1   ; WARTEN BIS BEI SPISR DAS SPIF FLAG 0 IST -> SONST WIEDERHOLEN
+ 4081  B600DD                      LDAA SPIDR                                                               ; DATEN AUS AKKU_A IN SPIDR 1. 8bit
+ 4084  7B00DD                      STAB SPIDR                                                               ; DATEN AUS SPIDR IN AKKU_B 2. 8bit
+ 4087            SPI_LOOP_SPISR_CLEAR_2:
+ 4087  1F00DB80FB                  BRCLR SPISR, #SPIF, SPI_LOOP_SPISR_CLEAR_2   ; WARTEN BIS BEI SPISR DAS SPIF FLAG 0 IST -> SONST WIEDERHOLEN
+ 408C  F600DD                      LDAB SPIDR                                                               ; DATEN AUS SPIDR LESEN
+ 408F  1C000008                    BSET PORTA, #BIT3                                                ; SPI_CS AUF HIGH SETZTEN -> ADU DEAKTIVIEREN
+ 4093  3D                          RTS   
+ 4094                              
+ 4094                              
+ 4094                                            
+ 4094            ; **********************************************************************************
+ 4094            
+                        .ORG    $FFFE
+ FFFE  4000              .DW     START           ; RESTART Vektor

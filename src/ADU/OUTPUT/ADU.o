@@ -1,0 +1,81 @@
+XH
+H 2 areas 0 global symbols
+M ADU.S
+A text size 0 flags 0
+A Memory size 10000 flags C
+dbfile ..\ADU.S
+dbfunc 0 ? 4000 I
+dbline 24 4000
+dbline 25 4003
+dbline 28 4006
+dbline 29 4009
+dbline 2F 400C
+dbline 30 400F
+dbline 31 4012
+dbline 36 4015
+dbline 37 4018
+dbline 38 401B
+dbline 3B 401C
+dbline 3C 401F
+dbline 3D 4022
+dbline 3E 4025
+dbline 41 4026
+dbline 42 402A
+dbline 43 402F
+dbline 44 4034
+dbline 45 4038
+dbline 4D 4039
+dbline 4E 403E
+dbline 50 4043
+dbline 51 4046
+dbline 52 4049
+dbline 53 404C
+dbline 54 404F
+dbline 58 4054
+dbline 59 4057
+dbline 5A 405A
+dbline 5D 405D
+dbline 5E 4060
+dbline 5F 4062
+dbline 60 4065
+dbline 61 4068
+dbline 62 406B
+dbline 68 406C
+dbline 69 406F
+dbline 6A 4071
+dbline 6B 4072
+dbline 6C 4073
+dbline 6D 4074
+dbline 6E 4075
+dbline 6F 4079
+dbline 72 407C
+dbline 73 4081
+dbline 74 4084
+dbline 76 4087
+dbline 77 408C
+dbline 78 408F
+dbline 79 4093
+T 40 00 CF 10 00 16 F8 00 16 40 26 16 40 15 16
+R 00 00 00 01 00 09 00 01 00 0C 00 01
+T 40 0D 40 39 16 40 1C 06 40 0C CE FF FF 16 F8 03
+R 00 00 00 01 00 02 00 01 00 05 00 01 00 08 00 01
+T 40 1B 3D B6 10 00 CD 02 08 16 F8 06 3D 1C 00 02
+R 00 00 00 01 00 04 00 01
+T 40 29 08 18 0B 54 00 D8 18 0B 00 00 DA 1C 00 00
+R 00 00 00 01
+T 40 37 08 3D 18 0B 00 10 00 18 0B 80 10 01 B6
+R 00 00 00 01 00 07 00 01 00 0C 00 01
+T 40 44 10 00 BA 10 01 16 40 6C 16 F8 09 1F 00 01
+R 00 00 00 01 00 02 00 01 00 05 00 01 00 08 00 01
+T 40 52 01 09 B6 10 00 BA 10 01 7A 10 00 74
+R 00 00 00 01 00 05 00 01 00 08 00 01 00 0B 00 01
+T 40 5E 10 01 26 E1 B6 10 00 16 40 6C 16 F8 09 3D
+R 00 00 00 01 00 02 00 01 00 07 00 01 00 0A 00 01
+T 40 6C 7A 10 02 C6 00 49 49 49 49 1D 00 00 08 7A
+R 00 00 00 01 00 03 00 01
+T 40 7A 00 DD 1F 00 DB 80 FB B6 00 DD 7B 00 DD 1F
+R 00 00 00 01
+T 40 88 00 DB 80 FB F6 00 DD 1C 00 00 08 3D
+R 00 00 00 01
+T FF FE 40 00
+R 00 00 00 01 00 02 00 01
