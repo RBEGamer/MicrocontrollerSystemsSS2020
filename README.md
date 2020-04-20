@@ -37,3 +37,7 @@ LED Pattern with 4 phases:
 * PHASE_2 PS5 PS7 ACTIVE
 * PHASE_3 PS4 PS7 ACTIVE
 * PHASE_4 PS5 PS6 ACTIVE
+
+### ADU
+
+Using a approximation to set a dac voltaget to a user defined ref voltage. using a comperator an PB0 that indicates that the ref voltage is higher/lower the dac set voltage. by checking the PB0 and sending different voltages to the dac, the dac voltage can be approx to the ref voltage
