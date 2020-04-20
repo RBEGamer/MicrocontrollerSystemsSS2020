@@ -8,6 +8,8 @@
 ## USED HARDWARE
 
 * CardS12 Module  with MC9S12D64
+* AD5300 DAC `ADU`
+* four LEDS AND BUTTONS `LEDTeil1`
 
 
 
