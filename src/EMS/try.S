@@ -39,8 +39,8 @@ unsigned short button_state;
 //=== Hauptroutine =============================================
 
 while(1){ 
-		  		    button_state = PORTB<<4;//& 0b11110000; //ZUSTAND EINLESEN
-					PORTS = button_state; //AUF LEDS SCHREIBEN
+		  		    
+					PORTS = PORTB<<4; //AUF LEDS SCHREIBEN
 					
 					DisplayPortNo[0] = 48 + menucounter; //0-9
 					
