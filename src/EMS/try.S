@@ -43,7 +43,13 @@ while(1){
 					PORTS = button_state; //AUF LEDS SCHREIBEN
 					
 					DisplayPortNo[0] = 48 + menucounter; //0-9
-					DisplayPortStatus[0] = 48 + (PORTB &(0b00010000<<menucounter));
+					
+					if(PORTB &(0b00000001<<menucounter)){
+					DisplayPortStatus[0] = 49;
+					}else{
+					DisplayPortStatus[0] = 48;
+					}
+					
 					
 					//UPSATE DISPLAY
 					LCD4x20C(3,14,DisplayPortNo);
